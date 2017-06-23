@@ -1,0 +1,22 @@
+{
+  "name": "spqr/hidemail",
+  "module": "spqr/hidemail",
+  "version": "1.0.0",
+  "type": "pagekit-extension",
+  "title": "Hide Mail",
+  "description": "Prevents your site from being crawled by spammers searching for mail-addresses.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Roman Lossin-Beßler",
+      "homepage": "https://spqr.wtf"
+    }
+  ],
+  "extra": {
+    "icon": "icon.svg",
+    "scripts": "scripts.php"
+  },
+  "require": {
+    "sunra/php-simple-html-dom-parser": "1.5.2"
+  }
+}
