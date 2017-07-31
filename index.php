@@ -25,18 +25,27 @@ return [
 	
 	'permissions' => [],
 	
-	'settings' => '',
+	'settings' => 'hidemail-settings',
 	
 	'resources' => [
 		'hidemail:' => ''
 	],
 	
-	'config' => [],
+	'config' => [
+		'nodes' => []
+	],
 	
 	'events' => [
 		'boot' => function( $event, $app ) {
 			$app->subscribe(
 				new HidemailPlugin
+			);
+		},
+		'view.scripts' => function( $event, $scripts ) use ( $app ) {
+			$scripts->register(
+				'hidemail-settings',
+				'spqr/hidemail:app/bundle/hidemail-settings.js',
+				[ '~extensions', 'input-tree', 'editor' ]
 			);
 		}
 	]

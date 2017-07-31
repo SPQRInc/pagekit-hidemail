@@ -2,6 +2,7 @@
 
 namespace Spqr\Hidemail\Plugin;
 
+use Pagekit\Application as App;
 use Pagekit\Content\Event\ContentEvent;
 use Pagekit\Event\EventSubscriberInterface;
 use Sunra\PhpSimple\HtmlDomParser;
@@ -17,24 +18,34 @@ class HidemailPlugin implements EventSubscriberInterface
 	 */
 	public function onContentPlugins( ContentEvent $event )
 	{
-		$content = $event->getContent();
 		
-		if ( $content ) {
+		$config = App::module( 'spqr/hidemail' )->config();
+		
+		
+		if ( ( !$config[ 'nodes' ] || in_array(
+					App::request()->attributes->get( '_node' ),
+					$config[ 'nodes' ]
+				) ) && App::request()->server->get( 'REQUEST_METHOD' ) == 'GET' ) {
 			
-			$pattern =
-				"/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
+			$content = $event->getContent();
 			
-			preg_match_all( $pattern, $content, $matches );
-			
-			foreach ( $matches[ 0 ] as $email ) {
-				$content = $this->searchDOM(
-					$content,
-					$email,
-					$this->obfuscate( $email )
-				);
+			if ( $content ) {
+				
+				$pattern =
+					"/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
+				
+				preg_match_all( $pattern, $content, $matches );
+				
+				foreach ( $matches[ 0 ] as $email ) {
+					$content = $this->searchDOM(
+						$content,
+						$email,
+						$this->obfuscate( $email )
+					);
+				}
+				
+				$event->setContent( $content );
 			}
-			
-			$event->setContent( $content );
 		}
 	}
 	
@@ -73,7 +84,6 @@ class HidemailPlugin implements EventSubscriberInterface
 	 * @return string
 	 */
 	function obfuscate( $email )
-	
 	{
 		$character_set = '+-.0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
 		
