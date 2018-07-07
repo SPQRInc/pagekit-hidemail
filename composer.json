@@ -1,7 +1,7 @@
 {
   "name": "spqr/hidemail",
   "module": "spqr/hidemail",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "pagekit-extension",
   "title": "Hide Mail",
   "description": "Prevents your site from being crawled by spammers searching for mail-addresses.",
